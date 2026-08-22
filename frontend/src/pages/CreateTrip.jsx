@@ -43,19 +43,45 @@ function CreateTrip() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
+                        "Authorization": `Bearer ${token}`,
                     },
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify({
+                        name: formData.name,
+                        startDate: formData.startDate,
+                        endDate: formData.endDate,
+                        description: formData.description,
+                    }),
                 }
             );
 
-            if (!response.ok) {
-                const text = await response.text();
+            const text = await response.text();
 
+            let data = {};
+
+            if (text) {
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { message: text };
+                }
+            }
+
+            if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                navigate("/login");
+                return;
+            }
+
+            if (!response.ok) {
                 throw new Error(
-                    text || "Failed to create trip"
+                    data.message ||
+                    data.error ||
+                    `Failed to create trip (${response.status})`
                 );
             }
+
+            console.log("Trip created:", data);
 
             navigate("/dashboard");
         } catch (err) {
@@ -83,6 +109,7 @@ function CreateTrip() {
                 </div>
 
                 <button
+                    type="button"
                     className="logout-button"
                     onClick={() => navigate("/dashboard")}
                 >
@@ -188,9 +215,7 @@ function CreateTrip() {
                         <button
                             type="button"
                             className="secondary-button"
-                            onClick={() =>
-                                navigate("/dashboard")
-                            }
+                            onClick={() => navigate("/dashboard")}
                         >
                             Cancel
                         </button>

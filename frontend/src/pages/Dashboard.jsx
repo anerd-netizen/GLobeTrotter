@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import {
+    getCurrentUser,
+    getMyTrips,
+    getTripStops,
+    deleteTrip,
+} from "../services/api";
+
 const destinations = [
     {
         name: "Goa",
@@ -35,7 +42,7 @@ function Dashboard() {
     const [error, setError] = useState("");
 
     // ---------------------------------------
-    // LOAD USER + TRIPS
+    // LOAD USER + TRIPS + STOPS
     // ---------------------------------------
 
     useEffect(() => {
@@ -48,29 +55,13 @@ function Dashboard() {
             }
 
             try {
-                // Load logged-in user
-                const userResponse = await fetch(
-                    "http://localhost:8080/api/auth/me",
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
+                setError("");
 
-                if (!userResponse.ok) {
-                    if (
-                        userResponse.status === 401 ||
-                        userResponse.status === 403
-                    ) {
-                        throw new Error("Session expired");
-                    }
+                // ---------------------------------------
+                // LOAD CURRENT USER
+                // ---------------------------------------
 
-                    throw new Error("Failed to load user");
-                }
-
-                const userData = await userResponse.json();
+                const userData = await getCurrentUser();
 
                 setUser(userData);
 
@@ -79,49 +70,76 @@ function Dashboard() {
                     JSON.stringify(userData)
                 );
 
-                // Load user's trips
-                const tripsResponse = await fetch(
-                    "http://localhost:8080/api/trips",
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+                // ---------------------------------------
+                // LOAD TRIPS
+                // ---------------------------------------
+
+                setTripsLoading(true);
+
+                const tripsData = await getMyTrips();
+
+                const tripsList = Array.isArray(tripsData)
+                    ? tripsData
+                    : [];
+
+                // ---------------------------------------
+                // LOAD STOPS FOR EACH TRIP
+                // ---------------------------------------
+
+                const tripsWithStops = await Promise.all(
+                    tripsList.map(async (trip) => {
+                        try {
+                            const stops = await getTripStops(
+                                trip.id
+                            );
+
+                            return {
+                                ...trip,
+                                stops: Array.isArray(stops)
+                                    ? stops
+                                    : [],
+                            };
+                        } catch (stopError) {
+                            console.error(
+                                `Failed to load stops for trip ${trip.id}:`,
+                                stopError
+                            );
+
+                            return {
+                                ...trip,
+                                stops: [],
+                            };
+                        }
+                    })
                 );
 
-                if (!tripsResponse.ok) {
-                    if (
-                        tripsResponse.status === 401 ||
-                        tripsResponse.status === 403
-                    ) {
-                        throw new Error("Session expired");
-                    }
-
-                    throw new Error("Failed to load trips");
-                }
-
-                const tripsData = await tripsResponse.json();
-
-                setTrips(
-                    Array.isArray(tripsData)
-                        ? tripsData
-                        : []
-                );
-
+                setTrips(tripsWithStops);
             } catch (err) {
-                console.error("Dashboard error:", err);
+                console.error(
+                    "Dashboard error:",
+                    err
+                );
 
-                if (err.message === "Session expired") {
+                const message =
+                    err?.message || "";
+
+                if (
+                    message.includes("401") ||
+                    message.includes("403") ||
+                    message.includes("Authentication failed") ||
+                    message.includes("Session expired")
+                ) {
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
 
                     navigate("/login");
-                } else {
-                    setError(
-                        "Unable to load your trips. Please try again."
-                    );
+                    return;
                 }
+
+                setError(
+                    message ||
+                    "Unable to load your dashboard. Please try again."
+                );
             } finally {
                 setLoading(false);
                 setTripsLoading(false);
@@ -159,6 +177,14 @@ function Dashboard() {
     }
 
     // ---------------------------------------
+    // OPEN ITINERARY
+    // ---------------------------------------
+
+    function handleOpenItinerary(id) {
+        navigate(`/trips/${id}/itinerary`);
+    }
+
+    // ---------------------------------------
     // DELETE TRIP
     // ---------------------------------------
 
@@ -171,27 +197,30 @@ function Dashboard() {
             return;
         }
 
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            navigate("/login");
-            return;
-        }
+        setError("");
 
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/trips/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+            await deleteTrip(id);
+
+            setTrips((currentTrips) =>
+                currentTrips.filter(
+                    (trip) => trip.id !== id
+                )
+            );
+        } catch (err) {
+            console.error(
+                "Delete trip error:",
+                err
             );
 
+            const message =
+                err?.message || "";
+
             if (
-                response.status === 401 ||
-                response.status === 403
+                message.includes("401") ||
+                message.includes("403") ||
+                message.includes("Authentication failed") ||
+                message.includes("Session expired")
             ) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
@@ -200,47 +229,12 @@ function Dashboard() {
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Failed to delete trip");
-            }
-
-            setTrips((currentTrips) =>
-                currentTrips.filter(
-                    (trip) => trip.id !== id
-                )
-            );
-
-        } catch (err) {
-            console.error("Delete trip error:", err);
-
             setError(
+                message ||
                 "Unable to delete the trip. Please try again."
             );
         }
     }
-
-    // ---------------------------------------
-    // LOADING
-    // ---------------------------------------
-
-    if (loading) {
-        return (
-            <div className="dashboard-loading">
-                Loading Globetrotter...
-            </div>
-        );
-    }
-
-    // ---------------------------------------
-    // DESTINATION SEARCH
-    // ---------------------------------------
-
-    const filteredDestinations =
-        destinations.filter((destination) =>
-            `${destination.name} ${destination.country}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
 
     // ---------------------------------------
     // DATE FORMAT
@@ -268,13 +262,38 @@ function Dashboard() {
     }
 
     // ---------------------------------------
+    // LOADING
+    // ---------------------------------------
+
+    if (loading) {
+        return (
+            <div className="dashboard-loading">
+                Loading Globetrotter...
+            </div>
+        );
+    }
+
+    // ---------------------------------------
+    // DESTINATION SEARCH
+    // ---------------------------------------
+
+    const filteredDestinations =
+        destinations.filter((destination) =>
+            `${destination.name} ${destination.country}`
+                .toLowerCase()
+                .includes(search.toLowerCase())
+        );
+
+    // ---------------------------------------
     // DASHBOARD
     // ---------------------------------------
 
     return (
         <div className="dashboard">
 
-            {/* NAVBAR */}
+            {/* =====================================
+                NAVBAR
+            ====================================== */}
 
             <nav className="navbar">
 
@@ -285,7 +304,7 @@ function Dashboard() {
                 <div className="nav-right">
 
                     <span>
-                        {user?.name}
+                        {user?.name || "Traveler"}
                     </span>
 
                     <button
@@ -300,11 +319,15 @@ function Dashboard() {
 
             </nav>
 
-            {/* MAIN */}
+            {/* =====================================
+                MAIN CONTENT
+            ====================================== */}
 
             <main className="dashboard-content">
 
-                {/* HERO */}
+                {/* =================================
+                    HERO
+                ================================== */}
 
                 <section className="hero-section">
 
@@ -331,7 +354,9 @@ function Dashboard() {
 
                 </section>
 
-                {/* SEARCH */}
+                {/* =================================
+                    SEARCH
+                ================================== */}
 
                 <section className="search-section">
 
@@ -343,14 +368,16 @@ function Dashboard() {
                         type="text"
                         placeholder="🔍 Search destinations..."
                         value={search}
-                        onChange={(e) =>
-                            setSearch(e.target.value)
+                        onChange={(event) =>
+                            setSearch(event.target.value)
                         }
                     />
 
                 </section>
 
-                {/* DESTINATIONS */}
+                {/* =================================
+                    POPULAR DESTINATIONS
+                ================================== */}
 
                 <section>
 
@@ -399,7 +426,9 @@ function Dashboard() {
 
                 </section>
 
-                {/* MY TRIPS */}
+                {/* =================================
+                    MY TRIPS
+                ================================== */}
 
                 <section className="trips-section">
 
@@ -408,8 +437,6 @@ function Dashboard() {
                         <h2>
                             My Trips
                         </h2>
-
-                        {/* CREATE TRIP */}
 
                         <button
                             type="button"
@@ -429,7 +456,9 @@ function Dashboard() {
                         </div>
                     )}
 
-                    {/* TRIPS LOADING */}
+                    {/* =================================
+                        TRIPS LOADING
+                    ================================== */}
 
                     {tripsLoading ? (
 
@@ -447,7 +476,9 @@ function Dashboard() {
 
                     ) : trips.length === 0 ? (
 
-                        /* EMPTY TRIPS */
+                        /* =================================
+                           NO TRIPS
+                        ================================== */
 
                         <div className="empty-trips">
 
@@ -476,87 +507,171 @@ function Dashboard() {
 
                     ) : (
 
-                        /* TRIPS GRID */
+                        /* =================================
+                           TRIPS GRID
+                        ================================== */
 
                         <div className="trips-grid">
 
-                            {trips.map((trip) => (
+                            {trips.map((trip) => {
 
-                                <div
-                                    className="trip-card"
-                                    key={trip.id}
-                                >
+                                const stops =
+                                    Array.isArray(trip.stops)
+                                        ? trip.stops
+                                        : [];
 
-                                    {/* CARD HEADER */}
+                                return (
+                                    <div
+                                        className="trip-card"
+                                        key={trip.id}
+                                    >
 
-                                    <div className="trip-card-header">
+                                        {/* =========================
+                                            TRIP HEADER
+                                        ========================== */}
 
-                                        <div>
+                                        <div className="trip-card-header">
 
-                                            <h3>
-                                                {trip.name}
-                                            </h3>
+                                            <div>
 
-                                            <p className="trip-dates">
-                                                📅{" "}
-                                                {formatDate(
-                                                    trip.startDate
-                                                )}{" "}
-                                                →{" "}
-                                                {formatDate(
-                                                    trip.endDate
-                                                )}
-                                            </p>
+                                                <h3>
+                                                    {trip.name}
+                                                </h3>
+
+                                                <p className="trip-dates">
+                                                    📅{" "}
+                                                    {formatDate(
+                                                        trip.startDate
+                                                    )}{" "}
+                                                    →{" "}
+                                                    {formatDate(
+                                                        trip.endDate
+                                                    )}
+                                                </p>
+
+                                            </div>
+
+                                            <span className="trip-icon">
+                                                ✈️
+                                            </span>
 
                                         </div>
 
-                                        <span className="trip-icon">
-                                            ✈️
-                                        </span>
+                                        {/* =========================
+                                            CITY COUNT
+                                        ========================== */}
+
+                                        <div className="trip-meta">
+
+                                            <span>
+                                                📍{" "}
+                                                {stops.length}{" "}
+                                                {stops.length === 1
+                                                    ? "city"
+                                                    : "cities"}
+                                            </span>
+
+                                        </div>
+
+                                        {/* =========================
+                                            DESCRIPTION
+                                        ========================== */}
+
+                                        {trip.description && (
+                                            <p className="trip-description">
+                                                {trip.description}
+                                            </p>
+                                        )}
+
+                                        {/* =========================
+                                            STOPS PREVIEW
+                                        ========================== */}
+
+                                        {stops.length > 0 && (
+
+                                            <div className="trip-stops-preview">
+
+                                                {stops
+                                                    .slice(0, 3)
+                                                    .map((stop) => (
+
+                                                        <span
+                                                            key={stop.id}
+                                                            className="stop-chip"
+                                                        >
+                                                            📍{" "}
+                                                            {stop.city}
+                                                        </span>
+
+                                                    ))}
+
+                                                {stops.length > 3 && (
+
+                                                    <span className="stop-chip">
+                                                        +{" "}
+                                                        {stops.length - 3}{" "}
+                                                        more
+                                                    </span>
+
+                                                )}
+
+                                            </div>
+
+                                        )}
+
+                                        {/* =========================
+                                            ACTION BUTTONS
+                                        ========================== */}
+
+                                        <div className="trip-actions">
+
+                                            {/* ITINERARY */}
+
+                                            <button
+                                                type="button"
+                                                className="primary-button"
+                                                onClick={() =>
+                                                    handleOpenItinerary(
+                                                        trip.id
+                                                    )
+                                                }
+                                            >
+                                                Itinerary
+                                            </button>
+
+                                            {/* EDIT */}
+
+                                            <button
+                                                type="button"
+                                                className="secondary-button"
+                                                onClick={() =>
+                                                    handleEditTrip(
+                                                        trip.id
+                                                    )
+                                                }
+                                            >
+                                                Edit
+                                            </button>
+
+                                            {/* DELETE */}
+
+                                            <button
+                                                type="button"
+                                                className="delete-button"
+                                                onClick={() =>
+                                                    handleDeleteTrip(
+                                                        trip.id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
 
                                     </div>
-
-                                    {/* DESCRIPTION */}
-
-                                    {trip.description && (
-                                        <p className="trip-description">
-                                            {trip.description}
-                                        </p>
-                                    )}
-
-                                    {/* ACTIONS */}
-
-                                    <div className="trip-actions">
-
-                                        <button
-                                            type="button"
-                                            className="secondary-button"
-                                            onClick={() =>
-                                                handleEditTrip(
-                                                    trip.id
-                                                )
-                                            }
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="delete-button"
-                                            onClick={() =>
-                                                handleDeleteTrip(
-                                                    trip.id
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            ))}
+                                );
+                            })}
 
                         </div>
 
