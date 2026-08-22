@@ -1,5 +1,6 @@
 package com.globetrotter.controller;
 
+import com.globetrotter.dto.TripResponse;
 import com.globetrotter.model.Trip;
 import com.globetrotter.service.TripService;
 import org.springframework.security.core.Authentication;
@@ -19,7 +20,7 @@ public class TripController {
     }
 
     @PostMapping
-    public Trip createTrip(
+    public TripResponse createTrip(
             @RequestBody Trip trip,
             Authentication authentication
     ) {
@@ -29,9 +30,30 @@ public class TripController {
     }
 
     @GetMapping
-    public List<Trip> getMyTrips(Authentication authentication) {
+    public List<TripResponse> getMyTrips(Authentication authentication) {
         String email = authentication.getName();
 
         return tripService.getMyTrips(email);
+    }
+
+    @PutMapping("/{id}")
+    public TripResponse updateTrip(
+            @PathVariable Long id,
+            @RequestBody Trip trip,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        return tripService.updateTrip(id, trip, email);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTrip(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+
+        tripService.deleteTrip(id, email);
     }
 }

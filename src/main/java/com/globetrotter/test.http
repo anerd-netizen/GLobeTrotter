@@ -1,15 +1,91 @@
+### Signup
 POST http://localhost:8080/api/auth/signup
 Content-Type: application/json
 
 {
-  "name": "JWT Test",
-  "email": "jwt@example.com",
+  "name": "Other User 4",
+  "email": "other4@example.com",
   "password": "123456"
 }
 
-###
+
+
+### Login
+POST http://localhost:8080/api/auth/login?email=other4@example.com&password=123456
 
 ###
+GET http://localhost:8080/api/test
 
-POST http://localhost:8080/api/auth/login?email=jwt@example.com&password=123456
+###
+GET http://localhost:8080/api/test
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJvdGhlcjRAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE0LCJpYXQiOjE3ODczNzY5MTQsImV4cCI6MTc4NzQ2MzMxNH0.LXc0exTvYjIo_I2BuBtKp6IsiElpT0LsTpkusBZlflFguQJfKOxEvDElbnUjwUbZ
 
+### User A signup
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Cross User A",
+  "email": "crossa@example.com",
+  "password": "123456"
+}
+
+### User B signup
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Cross User B",
+  "email": "crossb@example.com",
+  "password": "123456"
+}
+
+### Login A
+POST http://localhost:8080/api/auth/login?email=crossa@example.com&password=123456
+
+### Login B
+POST http://localhost:8080/api/auth/login?email=crossb@example.com&password=123456
+
+### Cross-user test - User A
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2FAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE1LCJpYXQiOjE3ODczNzcyMDIsImV4cCI6MTc4NzQ2MzYwMn0.7lBsRnDA4WicjfDT9qNZAHsYXAeV_eeeOslRsPsVsXGRgRAw4P77wfs8kGOZXU_m
+
+### Cross-user test - User B
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2JAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE2LCJpYXQiOjE3ODczNzcyMDgsImV4cCI6MTc4NzQ2MzYwOH0.Z_yU_XnqXgG8j1Sxn_EMxbvZpfJOW6TahgF9KdYyMyUsn08uLR8ZWL35pVJVbTgh
+
+### User A token
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2FAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE1LCJpYXQiOjE3ODczNzcyMDIsImV4cCI6MTc4NzQ2MzYwMn0.7lBsRnDA4WicjfDT9qNZAHsYXAeV_eeeOslRsPsVsXGRgRAw4P77wfs8kGOZXU_m
+
+### User B token
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2JAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE2LCJpYXQiOjE3ODczNzcyMDgsImV4cCI6MTc4NzQ2MzYwOH0.Z_yU_XnqXgG8j1Sxn_EMxbvZpfJOW6TahgF9KdYyMyUsn08uLR8ZWL35pVJVbTgh
+
+### No JWT
+GET http://localhost:8080/api/auth/me
+
+### Invalid JWT
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer this-is-not-a-real-jwt
+
+### User A -> own resource
+GET http://localhost:8080/api/users/15
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2FAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE1LCJpYXQiOjE3ODczNzcyMDIsImV4cCI6MTc4NzQ2MzYwMn0.7lBsRnDA4WicjfDT9qNZAHsYXAeV_eeeOslRsPsVsXGRgRAw4P77wfs8kGOZXU_m
+
+### User A -> User B resource
+GET http://localhost:8080/api/users/16
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjcm9zc2FAZXhhbXBsZS5jb20iLCJ1c2VySWQiOjE1LCJpYXQiOjE3ODczNzcyMDIsImV4cCI6MTc4NzQ2MzYwMn0.7lBsRnDA4WicjfDT9qNZAHsYXAeV_eeeOslRsPsVsXGRgRAw4P77wfs8kGOZXU_m
+
+###
+POST http://localhost:8080/api/auth/login?email=other4%40example.com&password=123456
+
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Param Test",
+  "email": "testsignup@example.com",
+  "password": "GlobeDev2026!Param"
+}
