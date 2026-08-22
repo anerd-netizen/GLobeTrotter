@@ -120,7 +120,7 @@ function ItineraryBuilder() {
                     onClick={() => navigate("/dashboard")}
                     style={{ cursor: "pointer" }}
                 >
-                    ?? Globetrotter
+                     Globetrotter
                 </div>
 
                 <button
@@ -139,7 +139,7 @@ function ItineraryBuilder() {
                     </p>
 
                     <h1>
-                        Itinerary Builder ??
+                        Itinerary Builder
                     </h1>
 
                     <p>
@@ -232,7 +232,7 @@ function ItineraryBuilder() {
                                         navigate(`/trips/${id}/activities`)
                                     }
                                 >
-                                    ?? Activities
+                                     Activities
                                 </button>
 
                                 <button
@@ -242,7 +242,7 @@ function ItineraryBuilder() {
                                         navigate(`/trips/${id}/budget`)
                                     }
                                 >
-                                    ?? Budget
+                                     Budget
                                 </button>
                             </div>
                         )}
@@ -251,7 +251,7 @@ function ItineraryBuilder() {
                     {stops.length === 0 ? (
                         <div className="empty-trips">
                             <div className="empty-icon">
-                                ???
+                                +
                             </div>
 
                             <h3>
@@ -283,15 +283,15 @@ function ItineraryBuilder() {
                                             </h3>
 
                                             <p className="trip-dates">
-                                                ??{" "}
+                                                {" "}
                                                 {formatDate(stop.startDate)}
-                                                {" ? "}
+                                                {" â†’ "}
                                                 {formatDate(stop.endDate)}
                                             </p>
                                         </div>
 
                                         <span className="trip-icon">
-                                            ??
+
                                         </span>
 
                                     </div>

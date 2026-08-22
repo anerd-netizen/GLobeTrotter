@@ -116,7 +116,7 @@ function Budget() {
                     onClick={() => navigate("/dashboard")}
                     style={{ cursor: "pointer" }}
                 >
-                    ?? Globetrotter
+                     Globetrotter
                 </div>
 
                 <button
@@ -130,7 +130,7 @@ function Budget() {
             <main className="trip-page-content">
                 <div className="trip-form-header">
                     <p className="eyebrow">TRIP FINANCES</p>
-                    <h1>Budget & Expenses ??</h1>
+                    <h1>Budget & Expenses </h1>
                     <p>
                         Track your estimated spending and keep your trip
                         within budget.
@@ -147,7 +147,7 @@ function Budget() {
                     <div className="trip-card">
                         <p className="eyebrow">TOTAL EXPENSES</p>
                         <h2>
-                            ?{Number(summary.total || 0).toLocaleString("en-IN")}
+                            â‚¹{Number(summary.total || 0).toLocaleString("en-IN")}
                         </h2>
                     </div>
 
@@ -156,7 +156,7 @@ function Budget() {
                             <div className="trip-card" key={category}>
                                 <p className="eyebrow">{category}</p>
                                 <h3>
-                                    ?{Number(amount || 0).toLocaleString("en-IN")}
+                                    â‚¹{Number(amount || 0).toLocaleString("en-IN")}
                                 </h3>
                             </div>
                         )
@@ -192,7 +192,7 @@ function Budget() {
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Amount (?)</label>
+                            <label>Amount (â‚¹)</label>
                             <input
                                 name="amount"
                                 type="number"
@@ -261,7 +261,7 @@ function Budget() {
                                         </div>
 
                                         <h3>
-                                            ?{Number(
+                                            â‚¹{Number(
                                                 expense.amount
                                             ).toLocaleString("en-IN")}
                                         </h3>
