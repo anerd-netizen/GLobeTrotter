@@ -147,7 +147,7 @@ function Budget() {
                     <div className="trip-card">
                         <p className="eyebrow">TOTAL EXPENSES</p>
                         <h2>
-                            â‚¹{Number(summary.total || 0).toLocaleString("en-IN")}
+                            Rs. {Number(summary.total || 0).toLocaleString("en-IN")}
                         </h2>
                     </div>
 
@@ -156,7 +156,7 @@ function Budget() {
                             <div className="trip-card" key={category}>
                                 <p className="eyebrow">{category}</p>
                                 <h3>
-                                    â‚¹{Number(amount || 0).toLocaleString("en-IN")}
+                                    Rs. {Number(amount || 0).toLocaleString("en-IN")}
                                 </h3>
                             </div>
                         )
@@ -192,7 +192,7 @@ function Budget() {
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Amount (â‚¹)</label>
+                            <label>Amount (Rs.)</label>
                             <input
                                 name="amount"
                                 type="number"
@@ -261,7 +261,7 @@ function Budget() {
                                         </div>
 
                                         <h3>
-                                            â‚¹{Number(
+                                            Rs. {Number(
                                                 expense.amount
                                             ).toLocaleString("en-IN")}
                                         </h3>

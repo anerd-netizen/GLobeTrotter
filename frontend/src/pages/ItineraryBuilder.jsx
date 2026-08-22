@@ -283,10 +283,7 @@ function ItineraryBuilder() {
                                             </h3>
 
                                             <p className="trip-dates">
-                                                {" "}
-                                                {formatDate(stop.startDate)}
-                                                {" â†’ "}
-                                                {formatDate(stop.endDate)}
+                                                {formatDate(stop.startDate)} to {formatDate(stop.endDate)}
                                             </p>
                                         </div>
 
