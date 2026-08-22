@@ -7,67 +7,39 @@ import CreateTrip from "./pages/CreateTrip";
 import EditTrip from "./pages/EditTrip";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import ActivityManager from "./pages/ActivityManager";
+import Budget from "./pages/Budget";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
 
-                {/* Authentication */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
 
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
+                <Route path="/dashboard" element={<Dashboard />} />
 
-                <Route
-                    path="/signup"
-                    element={<Signup />}
-                />
-
-                {/* Dashboard */}
-
-                <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                />
-
-                {/* Trip Management */}
-
-                <Route
-                    path="/create-trip"
-                    element={<CreateTrip />}
-                />
-
-                <Route
-                    path="/edit-trip/:id"
-                    element={<EditTrip />}
-                />
-
-                {/* Itinerary */}
+                <Route path="/create-trip" element={<CreateTrip />} />
+                <Route path="/edit-trip/:id" element={<EditTrip />} />
 
                 <Route
                     path="/trips/:id/itinerary"
                     element={<ItineraryBuilder />}
                 />
 
-                {/* Activities */}
-
                 <Route
                     path="/trips/:id/activities"
                     element={<ActivityManager />}
                 />
 
-                {/* Fallback */}
+                <Route
+                    path="/trips/:id/budget"
+                    element={<Budget />}
+                />
 
                 <Route
                     path="*"
-                    element={
-                        <Navigate
-                            to="/login"
-                            replace
-                        />
-                    }
+                    element={<Navigate to="/login" replace />}
                 />
 
             </Routes>

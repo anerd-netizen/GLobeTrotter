@@ -279,3 +279,79 @@ export async function deleteActivity(
 
     await parseResponse(response);
 }
+// ---------------------------------------
+// BUDGET
+// ---------------------------------------
+
+export async function getBudgetExpenses(tripId) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/trips/${tripId}/budget`,
+        {
+            method: "GET",
+            headers: authHeaders(),
+        }
+    );
+
+    return parseResponse(response);
+}
+
+export async function getBudgetSummary(tripId) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/trips/${tripId}/budget/summary`,
+        {
+            method: "GET",
+            headers: authHeaders(),
+        }
+    );
+
+    return parseResponse(response);
+}
+
+export async function createBudgetExpense(tripId, expense) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/trips/${tripId}/budget`,
+        {
+            method: "POST",
+            headers: authHeaders({
+                "Content-Type": "application/json",
+            }),
+            body: JSON.stringify(expense),
+        }
+    );
+
+    return parseResponse(response);
+}
+
+export async function updateBudgetExpense(
+    tripId,
+    expenseId,
+    expense
+) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/trips/${tripId}/budget/${expenseId}`,
+        {
+            method: "PUT",
+            headers: authHeaders({
+                "Content-Type": "application/json",
+            }),
+            body: JSON.stringify(expense),
+        }
+    );
+
+    return parseResponse(response);
+}
+
+export async function deleteBudgetExpense(
+    tripId,
+    expenseId
+) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/trips/${tripId}/budget/${expenseId}`,
+        {
+            method: "DELETE",
+            headers: authHeaders(),
+        }
+    );
+
+    await parseResponse(response);
+}
