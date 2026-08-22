@@ -6,28 +6,29 @@ import {
     getMyTrips,
     getTripStops,
     deleteTrip,
+    searchCities,
 } from "../services/api";
 
 const destinations = [
     {
         name: "Goa",
         country: "India",
-        emoji: "🏝️",
+        emoji: "\uD83C\uDFDD\uFE0F",
     },
     {
         name: "Paris",
         country: "France",
-        emoji: "🗼",
+        emoji: "\uD83D\uDDFD",
     },
     {
         name: "Tokyo",
         country: "Japan",
-        emoji: "🗻",
+        emoji: "\uD83D\uDDFB",
     },
     {
         name: "Dubai",
         country: "UAE",
-        emoji: "🏙️",
+        emoji: "\uD83C\uDFD9\uFE0F",
     },
 ];
 
@@ -39,6 +40,8 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [tripsLoading, setTripsLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [cityResults, setCityResults] = useState([]);
+    const [citySearching, setCitySearching] = useState(false);
     const [error, setError] = useState("");
 
     // ---------------------------------------
@@ -261,6 +264,45 @@ function Dashboard() {
         );
     }
 
+// ---------------------------------------
+    // DESTINATION SEARCH
+    // ---------------------------------------
+
+    useEffect(() => {
+        const query = search.trim();
+
+        if (!query) {
+            setCityResults([]);
+            setCitySearching(false);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            try {
+                setCitySearching(true);
+
+                const results = await searchCities(query);
+
+                setCityResults(
+                    Array.isArray(results)
+                        ? results
+                        : []
+                );
+            } catch (error) {
+                console.error("City search failed:", error);
+                setCityResults([]);
+            } finally {
+                setCitySearching(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const filteredDestinations = search.trim()
+        ? cityResults
+        : destinations;
+
     // ---------------------------------------
     // LOADING
     // ---------------------------------------
@@ -273,16 +315,6 @@ function Dashboard() {
         );
     }
 
-    // ---------------------------------------
-    // DESTINATION SEARCH
-    // ---------------------------------------
-
-    const filteredDestinations =
-        destinations.filter((destination) =>
-            `${destination.name} ${destination.country}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
 
     // ---------------------------------------
     // DASHBOARD
@@ -298,7 +330,7 @@ function Dashboard() {
             <nav className="navbar">
 
                 <div className="logo">
-                    🌍 Globetrotter
+                    {String.fromCodePoint(0x1F30D)} Globetrotter
                 </div>
 
                 <div className="nav-right">
@@ -341,7 +373,7 @@ function Dashboard() {
                             Welcome back,{" "}
                             {user?.name?.split(" ")[0] ||
                                 "Traveler"}{" "}
-                            👋
+                            {String.fromCodePoint(0x1F44B)}
                         </h1>
 
                         <p className="hero-text">
@@ -366,7 +398,7 @@ function Dashboard() {
 
                     <input
                         type="text"
-                        placeholder="🔍 Search destinations..."
+                        placeholder="Search destinations..."
                         value={search}
                         onChange={(event) =>
                             setSearch(event.target.value)
@@ -465,8 +497,7 @@ function Dashboard() {
                         <div className="empty-trips">
 
                             <div className="empty-icon">
-                                ⏳
-                            </div>
+                                {String.fromCodePoint(0x23F3)}</div>
 
                             <h3>
                                 Loading your trips...
@@ -483,7 +514,7 @@ function Dashboard() {
                         <div className="empty-trips">
 
                             <div className="empty-icon">
-                                ✈️
+                                {String.fromCodePoint(0x1F30D)}
                             </div>
 
                             <h3>
@@ -539,11 +570,11 @@ function Dashboard() {
                                                 </h3>
 
                                                 <p className="trip-dates">
-                                                    📅{" "}
+                                                    {String.fromCodePoint(0x1F4C5)}{" "}
                                                     {formatDate(
                                                         trip.startDate
                                                     )}{" "}
-                                                    →{" "}
+                                                    {String.fromCodePoint(0x2192)}{" "}
                                                     {formatDate(
                                                         trip.endDate
                                                     )}
@@ -552,7 +583,7 @@ function Dashboard() {
                                             </div>
 
                                             <span className="trip-icon">
-                                                ✈️
+                                                {String.fromCodePoint(0x1F30D)}
                                             </span>
 
                                         </div>
@@ -564,7 +595,7 @@ function Dashboard() {
                                         <div className="trip-meta">
 
                                             <span>
-                                                📍{" "}
+                                                {String.fromCodePoint(0x1F4CD)}{" "}
                                                 {stops.length}{" "}
                                                 {stops.length === 1
                                                     ? "city"
@@ -599,7 +630,7 @@ function Dashboard() {
                                                             key={stop.id}
                                                             className="stop-chip"
                                                         >
-                                                            📍{" "}
+                                                            {String.fromCodePoint(0x1F4CD)}{" "}
                                                             {stop.city}
                                                         </span>
 
@@ -639,6 +670,20 @@ function Dashboard() {
                                                 Itinerary
                                             </button>
 
+
+                                            {/* CALENDAR */}
+
+                                            <button
+                                                type="button"
+                                                className="secondary-button"
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/trips/${trip.id}/calendar`
+                                                    )
+                                                }
+                                            >
+                                                Calendar
+                                            </button>
                                             {/* EDIT */}
 
                                             <button
@@ -686,3 +731,10 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+
+
+
+
+
+

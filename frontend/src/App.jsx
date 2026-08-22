@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -8,6 +8,8 @@ import EditTrip from "./pages/EditTrip";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import ActivityManager from "./pages/ActivityManager";
 import Budget from "./pages/Budget";
+import ItineraryView from "./pages/ItineraryView";
+import TripCalendar from "./pages/TripCalendar";
 
 function App() {
     return (
@@ -33,6 +35,16 @@ function App() {
                 />
 
                 <Route
+                    path="/trips/:id/itinerary-view"
+                    element={<ItineraryView />}
+                />
+
+<Route
+    path="/trips/:id/calendar"
+    element={<TripCalendar />}
+/>
+
+                <Route
                     path="/trips/:id/budget"
                     element={<Budget />}
                 />
@@ -48,3 +60,6 @@ function App() {
 }
 
 export default App;
+
+
+

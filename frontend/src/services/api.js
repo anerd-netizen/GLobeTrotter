@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+﻿const API_BASE_URL = "http://localhost:8080";
 
 // ---------------------------------------
 // COMMON HELPERS
@@ -354,4 +354,16 @@ export async function deleteBudgetExpense(
     );
 
     await parseResponse(response);
+}
+
+export async function searchCities(query) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/cities/search?q=${encodeURIComponent(query)}`,
+        {
+            method: "GET",
+            headers: authHeaders(),
+        }
+    );
+
+    return parseResponse(response);
 }

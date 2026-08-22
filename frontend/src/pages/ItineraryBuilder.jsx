@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     getTripStops,
@@ -244,6 +244,16 @@ function ItineraryBuilder() {
                                 >
                                      Budget
                                 </button>
+
+                                <button
+                                    type="button"
+                                    className="primary-button"
+                                    onClick={() =>
+                                        navigate(`/trips/${id}/itinerary-view`)
+                                    }
+                                >
+                                    View Itinerary
+                                </button>
                             </div>
                         )}
                     </div>
@@ -318,3 +328,4 @@ function ItineraryBuilder() {
 }
 
 export default ItineraryBuilder;
+
