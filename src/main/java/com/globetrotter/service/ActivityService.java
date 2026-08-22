@@ -70,7 +70,7 @@ public class ActivityService {
                 .orElseThrow(() -> new RuntimeException("Trip stop not found"));
 
         return activityRepository
-                .findByTripStopOrderByActivityDateAsc(tripStop.getId())
+                .findByTripStopOrderByActivityDateAsc(tripStop)
                 .stream()
                 .map(this::toResponse)
                 .toList();

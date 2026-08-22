@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
-    List<Activity> findByTripStopOrderByActivityDateAsc(Long tripStopId);
+    List<Activity> findByTripStopOrderByActivityDateAsc(TripStop tripStop);
 
     Optional<Activity> findByIdAndTripStop(Long id, TripStop tripStop);
 }

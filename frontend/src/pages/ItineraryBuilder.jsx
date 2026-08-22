@@ -94,9 +94,7 @@ function ItineraryBuilder() {
     }
 
     function formatDate(date) {
-        if (!date) {
-            return "";
-        }
+        if (!date) return "";
 
         return new Date(date).toLocaleDateString("en-IN", {
             day: "numeric",
@@ -122,7 +120,7 @@ function ItineraryBuilder() {
                     onClick={() => navigate("/dashboard")}
                     style={{ cursor: "pointer" }}
                 >
-                    🌍 Globetrotter
+                    ?? Globetrotter
                 </div>
 
                 <button
@@ -141,7 +139,7 @@ function ItineraryBuilder() {
                     </p>
 
                     <h1>
-                        Itinerary Builder ✈️
+                        Itinerary Builder ??
                     </h1>
 
                     <p>
@@ -223,27 +221,37 @@ function ItineraryBuilder() {
                 <section className="trips-section">
 
                     <div className="section-header">
-    <h2>
-        Your Journey
-    </h2>
+                        <h2>Your Journey</h2>
 
-    {stops.length > 0 && (
-        <button
-            type="button"
-            className="primary-button"
-            onClick={() =>
-                navigate(`/trips/${id}/activities`)
-            }
-        >
-            Manage Activities
-        </button>
-    )}
-</div>
+                        {stops.length > 0 && (
+                            <div className="trip-actions">
+                                <button
+                                    type="button"
+                                    className="primary-button"
+                                    onClick={() =>
+                                        navigate(`/trips/${id}/activities`)
+                                    }
+                                >
+                                    ?? Activities
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="primary-button"
+                                    onClick={() =>
+                                        navigate(`/trips/${id}/budget`)
+                                    }
+                                >
+                                    ?? Budget
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {stops.length === 0 ? (
                         <div className="empty-trips">
                             <div className="empty-icon">
-                                🗺️
+                                ???
                             </div>
 
                             <h3>
@@ -275,15 +283,15 @@ function ItineraryBuilder() {
                                             </h3>
 
                                             <p className="trip-dates">
-                                                📅{" "}
+                                                ??{" "}
                                                 {formatDate(stop.startDate)}
-                                                {" → "}
+                                                {" ? "}
                                                 {formatDate(stop.endDate)}
                                             </p>
                                         </div>
 
                                         <span className="trip-icon">
-                                            📍
+                                            ??
                                         </span>
 
                                     </div>
