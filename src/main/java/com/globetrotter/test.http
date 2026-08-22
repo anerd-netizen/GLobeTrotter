@@ -1,0 +1,15 @@
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "JWT Test",
+  "email": "jwt@example.com",
+  "password": "123456"
+}
+
+###
+
+###
+
+POST http://localhost:8080/api/auth/login?email=jwt@example.com&password=123456
+
