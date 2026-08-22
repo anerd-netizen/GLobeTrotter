@@ -36,7 +36,20 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // Public authentication endpoints
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/signup"
+                        ).permitAll()
+
+                        // Current user requires a valid JWT
+                        .requestMatchers("/api/auth/me").authenticated()
+
+                        // Spring error endpoint
+                        .requestMatchers("/error").permitAll()
+
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
 

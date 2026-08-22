@@ -3,6 +3,8 @@ package com.globetrotter.controller;
 import com.globetrotter.dto.AuthResponse;
 import com.globetrotter.model.User;
 import com.globetrotter.service.AuthService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +33,20 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public User me(Authentication authentication) {
+    public ResponseEntity<?> me(Authentication authentication) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized");
+        }
+
         String email = authentication.getName();
-        return authService.getUserByEmail(email);
+
+        User user = authService.getUserByEmail(email);
+
+        return ResponseEntity.ok(user);
     }
 }
